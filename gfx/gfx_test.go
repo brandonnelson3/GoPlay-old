@@ -67,7 +67,6 @@ func TestLoadShader_ReadFileError(t *testing.T) {
 }
 
 func testPrepOpenGL(t *testing.T) {
-	glfw.Init()
 	window, err := glfw.CreateWindow(1, 1, "Test", nil, nil)
 	if err != nil {
 		t.Fatalf("Got error while initializing window: %v", err)
