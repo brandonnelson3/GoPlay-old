@@ -9,6 +9,14 @@ import (
 	"github.com/go-gl/glfw/v3.1/glfw"
 )
 
+func TestMain(m *testing.M) {
+	glfw.Init()
+	glfw.WindowHint(glfw.ContextVersionMajor, 3)
+	glfw.WindowHint(glfw.ContextVersionMinor, 3)
+	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
+	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
+}
+
 func TestLoadShader(t *testing.T) {
 	testPrepOpenGL(t)
 	defer func() { ioutilReadFile = ioutil.ReadFile }()
