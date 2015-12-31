@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
+	"github.com/go-gl/glfw/v3.1/glfw"
 )
 
 var ioutilReadFile = ioutil.ReadFile
@@ -19,6 +20,14 @@ type shaderManager struct {
 
 func NewShaderManager() *shaderManager {
 	return &shaderManager{shaders: make(map[string]*shader)}
+}
+
+func init() {
+	glfw.Init()
+	glfw.WindowHint(glfw.ContextVersionMajor, 3)
+	glfw.WindowHint(glfw.ContextVersionMinor, 3)
+	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
+	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 }
 
 // Load a shader to be attached to a program.
