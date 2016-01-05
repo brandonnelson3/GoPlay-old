@@ -13,6 +13,7 @@ import (
 	"sync/atomic"
 
 	"github.com/brandonnelson3/GoPlay/gameobjects"
+	"github.com/brandonnelson3/GoPlay/input"
 )
 
 const windowWidth = 800
@@ -56,6 +57,8 @@ func main() {
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Println("OpenGL version", version)
 
+	inputmanager := input.NewManager(window)
+
 	// Configure global settings
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
@@ -70,6 +73,8 @@ func main() {
 
 	for !window.ShouldClose() {
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+		inputmanager.RunKeys()
 
 		// Update
 		time := glfw.GetTime()
