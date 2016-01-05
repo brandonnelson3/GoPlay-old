@@ -4,9 +4,14 @@ import (
 	"log"
 
 	"github.com/go-gl/glfw/v3.1/glfw"
+
+	"github.com/brandonnelson3/GoPlay/window"
 )
 
 const keyRange = 349
+
+// Global input manager
+var M manager
 
 type keyFunction func(bool)
 type manager struct {
@@ -15,14 +20,13 @@ type manager struct {
 	functions     [][]keyFunction
 }
 
-func NewManager(w *glfw.Window) manager {
-	result := manager{
+func init() {
+	M = manager{
 		down:          make([]bool, keyRange),
 		downThisFrame: make([]bool, keyRange),
 		functions:     make([][]keyFunction, keyRange),
 	}
-	w.SetKeyCallback(result.keyCallBack)
-	return result
+	window.M.W.SetKeyCallback(M.keyCallBack)
 }
 
 func (inputManager *manager) keyCallBack(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
@@ -39,12 +43,12 @@ func (inputManager *manager) keyCallBack(w *glfw.Window, key glfw.Key, scancode 
 }
 
 // Keycode values are from here: http://www.glfw.org/docs/latest/group__keys.html
-func (inputManager *manager) Register(keycode uint, f keyFunction) {
-	if keycode < uint(glfw.KeySpace) || keycode > uint(glfw.KeyMenu) {
-		log.Fatalf("Got invalid keycode in Register: %v", keycode)
+func (inputManager *manager) Register(key glfw.Key, f keyFunction) {
+	if key < glfw.KeySpace || key > glfw.KeyMenu {
+		log.Fatalf("Got invalid keycode in Register: %v", key)
 		return
 	}
-	inputManager.functions[keycode] = append(inputManager.functions[keycode], f)
+	inputManager.functions[key] = append(inputManager.functions[key], f)
 }
 
 func (inputManager *manager) RunKeys() {
