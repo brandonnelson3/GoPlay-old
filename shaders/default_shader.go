@@ -12,7 +12,7 @@ import (
 
 const vsSrc = `#version 330
 uniform mat4 projection;
-uniform mat4 camera;
+uniform mat4 view;
 uniform mat4 model;
 
 in vec3 vert;
@@ -22,7 +22,7 @@ out vec2 fragTexCoord;
 
 void main() {
     fragTexCoord = vertTexCoord;
-    gl_Position = projection * camera * model * vec4(vert, 1);
+    gl_Position = projection * view * model * vec4(vert, 1);
 }` + "\x00"
 
 const fsSrc = `#version 330
@@ -40,7 +40,7 @@ type DefaultShader struct {
 	id uint32
 
 	uniformLocation_projection int32
-	uniformLocation_camera     int32
+	uniformLocation_view       int32
 	uniformLocation_model      int32
 	uniformLocation_tex        int32
 }
@@ -97,7 +97,7 @@ func NewDefaultShader() (*DefaultShader, error) {
 	result := &DefaultShader{
 		id: pID,
 		uniformLocation_projection: gl.GetUniformLocation(pID, gl.Str("projection\x00")),
-		uniformLocation_camera:     gl.GetUniformLocation(pID, gl.Str("camera\x00")),
+		uniformLocation_view:       gl.GetUniformLocation(pID, gl.Str("view\x00")),
 		uniformLocation_model:      gl.GetUniformLocation(pID, gl.Str("model\x00")),
 		uniformLocation_tex:        gl.GetUniformLocation(pID, gl.Str("tex\x00")),
 	}
@@ -116,8 +116,8 @@ func (s *DefaultShader) SetProjection(d mgl32.Mat4) {
 	gl.UniformMatrix4fv(s.uniformLocation_projection, 1, false, &d[0])
 }
 
-func (s *DefaultShader) SetCamera(d mgl32.Mat4) {
-	gl.UniformMatrix4fv(s.uniformLocation_camera, 1, false, &d[0])
+func (s *DefaultShader) SetView(d mgl32.Mat4) {
+	gl.UniformMatrix4fv(s.uniformLocation_view, 1, false, &d[0])
 }
 
 func (s *DefaultShader) SetModel(d mgl32.Mat4) {

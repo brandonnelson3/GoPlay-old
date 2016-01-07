@@ -7,6 +7,7 @@ import (
 	"github.com/brandonnelson3/GoPlay/camera"
 	"github.com/brandonnelson3/GoPlay/shaders"
 	"github.com/brandonnelson3/GoPlay/texture"
+	"github.com/brandonnelson3/GoPlay/window"
 )
 
 var cubeVertices = []shaders.DefaultShader_Vertex{
@@ -73,17 +74,12 @@ func NewCube() (*cube, error) {
 		return nil, err
 	}
 	shader.Activate()
-	shader.SetProjection(mgl32.Perspective(mgl32.DegToRad(45.0), float32(800)/600, 0.1, 10.0))
-	shader.SetModel(mgl32.Ident4())
-
 	vbo := shaders.NewDefaultShader_VertexBuffer(shader, cubeVertices)
-
 	// Load the texture
 	texture, err := texture.New("assets/crate.jpg")
 	if err != nil {
 		return nil, err
 	}
-
 	return &cube{vbo: vbo, shader: shader, texture: texture}, nil
 }
 
@@ -94,7 +90,9 @@ func (c *cube) Update(t float64) {
 
 func (c *cube) Render() {
 	c.shader.Activate()
-	c.shader.SetCamera(mgl32.LookAtV(camera.C.Position, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0}))
+	c.shader.SetProjection(mgl32.Perspective(mgl32.DegToRad(camera.C.FOVDegrees), float32(window.M.Width)/float32(window.M.Height), camera.C.NearPlaneDist, camera.C.FarPlaneDist))
+	c.shader.SetModel(mgl32.Ident4())
+	c.shader.SetView(camera.C.GetViewMatrix())
 	c.texture.Bind(gl.TEXTURE0)
 	gl.DrawArrays(gl.TRIANGLES, 0, c.vbo.Size)
 }
