@@ -13,7 +13,7 @@ const keyRange = 349
 // Global input manager
 var M manager
 
-type keyFunction func(bool)
+type keyFunction func(bool, float32)
 type manager struct {
 	down          []bool
 	downThisFrame []bool
@@ -51,13 +51,13 @@ func (inputManager *manager) Register(key glfw.Key, f keyFunction) {
 	inputManager.functions[key] = append(inputManager.functions[key], f)
 }
 
-func (inputManager *manager) RunKeys() {
+func (inputManager *manager) RunKeys(d float32) {
 	// glfw.KeySpace is the lowest key.
 	for i := glfw.KeySpace; i < keyRange; i++ {
 		if inputManager.down[i] {
 			for j := 0; j < len(inputManager.functions[i]); j++ {
 				// Send true on all function calls except for the very first one after a button press.
-				inputManager.functions[i][j](!inputManager.downThisFrame[i])
+				inputManager.functions[i][j](!inputManager.downThisFrame[i], d)
 				inputManager.downThisFrame[i] = false
 			}
 		}

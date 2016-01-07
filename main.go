@@ -57,7 +57,7 @@ func main() {
 		elapsed := t - previousTime
 		previousTime = t
 
-		input.M.RunKeys()
+		input.M.RunKeys(float32(elapsed))
 
 		camera.C.Update(elapsed)
 
