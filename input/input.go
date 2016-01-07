@@ -27,6 +27,8 @@ func init() {
 		functions:     make([][]keyFunction, keyRange),
 	}
 	window.M.W.SetKeyCallback(M.keyCallBack)
+
+	M.Register(glfw.KeyEscape, exit)
 }
 
 func (inputManager *manager) keyCallBack(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
@@ -40,6 +42,10 @@ func (inputManager *manager) keyCallBack(w *glfw.Window, key glfw.Key, scancode 
 		inputManager.down[key] = false
 		inputManager.downThisFrame[key] = false
 	}
+}
+
+func exit(bool, float32) {
+	window.M.W.SetShouldClose(true)
 }
 
 // Keycode values are from here: http://www.glfw.org/docs/latest/group__keys.html

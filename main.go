@@ -69,5 +69,7 @@ func main() {
 		// Maintenance
 		window.M.W.SwapBuffers()
 		glfw.PollEvents()
+
+		window.M.W.SetCursorPos(float64(window.M.Width)/2, float64(window.M.Height)/2)
 	}
 }

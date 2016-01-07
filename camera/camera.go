@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/brandonnelson3/GoPlay/input"
+	"github.com/brandonnelson3/GoPlay/window"
 )
 
 var C FPS
@@ -52,6 +53,10 @@ func init() {
 	input.M.Register(glfw.KeyDown, C.Down)
 	input.M.Register(glfw.KeyLeft, C.Left)
 	input.M.Register(glfw.KeyRight, C.Right)
+
+	window.M.W.SetCursorPos(float64(window.M.Height)/2, float64(window.M.Width)/2)
+	window.M.W.SetCursorPosCallback(C.cursorPosCallback)
+	window.M.W.SetInputMode(glfw.CursorMode, glfw.CursorHidden)
 }
 
 func (c *FPS) Forward(bool, float32) {
@@ -88,6 +93,19 @@ func (c *FPS) Left(_ bool, d float32) {
 }
 func (c *FPS) Right(_ bool, d float32) {
 	c.horizontalAngle -= c.sensitivity * d
+	for c.horizontalAngle < 0 {
+		c.horizontalAngle += float32(2 * math.Pi)
+	}
+}
+
+func (c *FPS) cursorPosCallback(w *glfw.Window, x, y float64) {
+	x -= float64(window.M.Width) / 2
+	y -= float64(window.M.Height) / 2
+	c.verticalAngle -= c.sensitivity * float32(y) * .01
+	if c.verticalAngle < -Pi2 {
+		c.verticalAngle = float32(-Pi2 + 0.0001)
+	}
+	c.horizontalAngle -= c.sensitivity * float32(x) * .01
 	for c.horizontalAngle < 0 {
 		c.horizontalAngle += float32(2 * math.Pi)
 	}
