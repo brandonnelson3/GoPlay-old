@@ -5,6 +5,9 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 
 	"math"
+	"sync"
+
+	"fmt"
 
 	"github.com/brandonnelson3/GoPlay/input"
 	"github.com/brandonnelson3/GoPlay/window"
@@ -15,7 +18,9 @@ var C FPS
 const Pi2 = math.Pi / 2.0
 
 type FPS struct {
-	Position      mgl32.Vec3
+	positionMu sync.RWMutex
+	position   mgl32.Vec3
+
 	Speed         float32
 	FOVDegrees    float32
 	NearPlaneDist float32
@@ -30,16 +35,16 @@ type FPS struct {
 
 func init() {
 	C = FPS{
-		Position:      mgl32.Vec3{-6, 0, 0},
-		Speed:         10.0,
+		position:      mgl32.Vec3{9, 9, 9},
+		Speed:         20.0,
 		FOVDegrees:    45.0,
 		NearPlaneDist: 0.1,
 		FarPlaneDist:  10000.0,
 
 		direction:       mgl32.Vec3{0, 0, 0},
-		horizontalAngle: 0.0,
-		verticalAngle:   0.0,
-		sensitivity:     0.5,
+		horizontalAngle: 4.33,
+		verticalAngle:   .3,
+		sensitivity:     0.1,
 	}
 
 	// Normal wasd movement
@@ -77,6 +82,8 @@ func (c *FPS) Up(_ bool, d float32) {
 	if c.verticalAngle > Pi2-0.0001 {
 		c.verticalAngle = float32(Pi2 - 0.0001)
 	}
+
+	fmt.Printf("Angle: %v", c.verticalAngle)
 }
 func (c *FPS) Down(_ bool, d float32) {
 	c.verticalAngle -= c.sensitivity * d
@@ -89,7 +96,6 @@ func (c *FPS) Left(_ bool, d float32) {
 	for c.horizontalAngle > 2*math.Pi {
 		c.horizontalAngle -= float32(2 * math.Pi)
 	}
-
 }
 func (c *FPS) Right(_ bool, d float32) {
 	c.horizontalAngle -= c.sensitivity * d
@@ -114,9 +120,18 @@ func (c *FPS) cursorPosCallback(w *glfw.Window, x, y float64) {
 // TODO: Move this to the base struct.
 func (c *FPS) Update(d float64) {
 	if c.direction.X() != 0 || c.direction.Y() != 0 || c.direction.Z() != 0 {
-		c.Position = c.Position.Add(c.direction.Normalize().Mul(float32(d) * c.Speed))
+		delta := c.direction.Normalize().Mul(float32(d) * c.Speed)
+		c.positionMu.Lock()
+		c.position = c.position.Add(delta)
+		c.positionMu.Unlock()
 		c.direction = mgl32.Vec3{0, 0, 0}
 	}
+}
+
+func (c *FPS) GetPosition() mgl32.Vec3 {
+	c.positionMu.RLock()
+	defer c.positionMu.RUnlock()
+	return c.position
 }
 
 // TODO: Move this to the base struct. Also not a bad idea to memoize the result, and update only when dirty.
@@ -124,13 +139,14 @@ func (c *FPS) GetForward() mgl32.Vec3 {
 	return mgl32.Rotate3DY(c.horizontalAngle).Mul3x1(mgl32.Rotate3DZ(c.verticalAngle).Mul3x1((mgl32.Vec3{1, 0, 0})))
 }
 
-// TODO: Move this to the base
-// struct. Also not a bad idea to memoize the result, and update only when dirty.
+// TODO: Move this to the base struct. Also not a bad idea to memoize the result, and update only when dirty.
 func (c *FPS) GetRight() mgl32.Vec3 {
 	return mgl32.Rotate3DY(c.horizontalAngle).Mul3x1(mgl32.Vec3{0, 0, 1})
 }
 
 // TODO: Move this to the base struct.
 func (c *FPS) GetViewMatrix() mgl32.Mat4 {
-	return mgl32.LookAtV(c.Position, c.Position.Add(c.GetForward()), mgl32.Vec3{0, 1, 0})
+	c.positionMu.RLock()
+	defer c.positionMu.RUnlock()
+	return mgl32.LookAtV(c.position, c.position.Add(c.GetForward()), mgl32.Vec3{0, 1, 0})
 }

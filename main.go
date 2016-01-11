@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	_ "image/jpeg"
-	"log"
 	"runtime"
 	"time"
 
@@ -13,8 +12,8 @@ import (
 	"sync/atomic"
 
 	"github.com/brandonnelson3/GoPlay/camera"
-	"github.com/brandonnelson3/GoPlay/gameobjects"
 	"github.com/brandonnelson3/GoPlay/input"
+	"github.com/brandonnelson3/GoPlay/voxelterrain"
 	"github.com/brandonnelson3/GoPlay/window"
 )
 
@@ -26,7 +25,7 @@ func init() {
 var fps uint32
 
 func printFPS() {
-	log.Printf("FPS is currently %d/second", atomic.SwapUint32(&fps, 0))
+	//log.Printf("FPS is currently %d/second", atomic.SwapUint32(&fps, 0))
 	time.AfterFunc(1*time.Second, printFPS)
 }
 
@@ -42,13 +41,18 @@ func main() {
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
 
-	cube, err := gameobjects.NewCube()
+	//cube, err := gameobjects.NewCube()
+	//if err != nil {
+	//	panic(err)
+	//}
+
+	terrain, err := voxelterrain.NewTerrain()
 	if err != nil {
 		panic(err)
 	}
 
 	previousTime := glfw.GetTime()
-
+	gl.ClearColor(0, 0, 0, 0)
 	for !window.M.W.ShouldClose() {
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
@@ -61,8 +65,8 @@ func main() {
 
 		camera.C.Update(elapsed)
 
-		//cube.Update(elapsed)
-		cube.Render()
+		//cube.Render()
+		terrain.Render()
 
 		atomic.AddUint32(&fps, 1)
 

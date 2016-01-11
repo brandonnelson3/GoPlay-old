@@ -33,12 +33,12 @@ func init() {
 
 func (inputManager *manager) keyCallBack(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
 	if action == glfw.Press {
-		log.Printf("Got key press event: %v", key)
+		//log.Printf("Got key press event: %v", key)
 		inputManager.down[key] = true
 		inputManager.downThisFrame[key] = true
 	}
 	if action == glfw.Release {
-		log.Printf("Got key release event: %v", key)
+		//log.Printf("Got key release event: %v", key)
 		inputManager.down[key] = false
 		inputManager.downThisFrame[key] = false
 	}

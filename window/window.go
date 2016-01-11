@@ -5,8 +5,8 @@ import (
 	"github.com/go-gl/glfw/v3.1/glfw"
 )
 
-const windowWidth = 800
-const windowHeight = 600
+const windowWidth = 1920
+const windowHeight = 1200
 const windowTitle = "GoPlay"
 
 var M manager
